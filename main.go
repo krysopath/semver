@@ -3,12 +3,20 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 
 	"golang.org/x/mod/semver"
 )
+
+var (
+	isSorting = flag.Bool("sort", false, "sort strings from $* inputs with semver algo")
+)
+
+type SemanticVersionString string
 
 type SemanticVersion struct {
 	value string
@@ -30,22 +38,53 @@ func (s *SemanticVersion) Build() string {
 	return semver.Build(s.value)
 }
 func (s SemanticVersion) String() string {
-	out := map[string]string{
-		"canonical":  s.Canonical(),
-		"major":      s.Major(),
-		"majorminor": s.MajorMinor(),
-		"prerelease": s.Prerelease(),
-		"build":      s.Build(),
-	}
-	data, _ := json.Marshal(out)
+	asJson, _ := s.MarshalJSON()
+	data, _ := json.Marshal(asJson)
 	return fmt.Sprintf("%s", data)
 }
 
-func output(data string) {
+func (s SemanticVersion) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Canonical  string `json:"canonical"`
+		Major      string `json:"major"`
+		MajorMinor string `json:"majorminor"`
+		PreRelease string `json:"prerelease"`
+		Build      string `json:"build"`
+		Source     string `json:"source"`
+	}{
+		Canonical:  s.Canonical(),
+		Major:      s.Major(),
+		MajorMinor: s.MajorMinor(),
+		PreRelease: s.Prerelease(),
+		Build:      s.Build(),
+		Source:     s.value,
+	})
+}
+
+type ByVersion []SemanticVersion
+
+func (a ByVersion) Len() int           { return len(a) }
+func (a ByVersion) Less(i, j int) bool { return semver.Compare(a[i].value, a[j].value) < 0 }
+func (a ByVersion) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+func outputSingle(data string) {
 	trimmed := strings.TrimSpace(data)
 	semver := SemanticVersion{trimmed}
 
 	fmt.Fprintln(os.Stdout, semver)
+}
+
+func outputSorted(data string) {
+	trimmed := strings.TrimSpace(data)
+	vers := strings.Split(trimmed, " ")
+	var sorted []SemanticVersion
+	for _, v := range vers {
+		sorted = append(sorted, SemanticVersion{v})
+	}
+	sort.Sort(ByVersion(sorted))
+	out, _ := json.Marshal(sorted)
+
+	fmt.Fprintln(os.Stdout, string(out))
 }
 
 func input() string {
@@ -65,6 +104,11 @@ func input() string {
 }
 
 func main() {
-	output(input())
+	flag.Parse()
 
+	if *isSorting {
+		outputSorted(input())
+	} else {
+		outputSingle(input())
+	}
 }

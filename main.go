@@ -29,20 +29,22 @@ func (s *SemanticVersion) Prerelease() string {
 func (s *SemanticVersion) Build() string {
 	return semver.Build(s.value)
 }
+func (s SemanticVersion) String() string {
+	out := map[string]string{
+		"canonical":  s.Canonical(),
+		"major":      s.Major(),
+		"majorminor": s.MajorMinor(),
+		"prerelease": s.Prerelease(),
+		"build":      s.Build(),
+	}
+	data, _ := json.Marshal(out)
+	return fmt.Sprintf("%s", data)
+}
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 	version, _ := reader.ReadString('\n')
 	trimmed := strings.TrimSpace(version)
 	semver := SemanticVersion{trimmed}
-
-	out := map[string]string{
-		"canonical":  semver.Canonical(),
-		"major":      semver.Major(),
-		"majorminor": semver.MajorMinor(),
-		"prerelease": semver.Prerelease(),
-		"build":      semver.Build(),
-	}
-	data, _ := json.Marshal(out)
-	fmt.Println(string(data))
+	fmt.Fprintln(os.Stdout, semver)
 }

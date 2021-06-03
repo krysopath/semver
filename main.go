@@ -41,10 +41,30 @@ func (s SemanticVersion) String() string {
 	return fmt.Sprintf("%s", data)
 }
 
-func main() {
-	reader := bufio.NewReader(os.Stdin)
-	version, _ := reader.ReadString('\n')
-	trimmed := strings.TrimSpace(version)
+func output(data string) {
+	trimmed := strings.TrimSpace(data)
 	semver := SemanticVersion{trimmed}
+
 	fmt.Fprintln(os.Stdout, semver)
+}
+
+func input() string {
+	fi, err := os.Stdin.Stat()
+	if err != nil {
+		panic(err)
+	}
+	var version string
+
+	if fi.Mode()&os.ModeNamedPipe == 0 {
+		version = os.Getenv("CI_COMMIT_TAG")
+	} else {
+		reader := bufio.NewReader(os.Stdin)
+		version, _ = reader.ReadString('\n')
+	}
+	return version
+}
+
+func main() {
+	output(input())
+
 }

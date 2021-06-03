@@ -100,9 +100,11 @@ func input() string {
 func main() {
 	flag.Parse()
 
+	data := input()
+
 	if *isSorting {
-		outputSorted(input())
+		outputSorted(data)
 	} else {
-		outputSingle(input())
+		outputSingle(data)
 	}
 }

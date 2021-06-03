@@ -86,3 +86,28 @@ $ semver | jq
   "prerelease": "-some"
 }
 ```
+
+## In pipelines
+
+```
+# lets us the great jq to create nobrain parseable 
+export SEMVER="$(echo $CI_COMMIT_TAG | semver)"
+
+# lets record the -prerelease+build as SUFFIX
+export SUFFIX="$(echo $SEMVER | jq -r .prerelease)$(echo $SEMVER | jq -r .build)"
+
+# lets create the semvers, appending SUFFIX (for edgecase, you know)
+export MAJORMINOR="$(echo $SEMVER | jq -r .majorminor)$SUFFIX"
+export MAJOR="$(echo $SEMVER | jq -r .major)$SUFFIX"
+export CANONICAL="$(echo $SEMVER | jq -r .canonical)"
+
+# tag one distinct artifact with these three versions
+docker tag $CI_IMAGE_TAG "$CI_REGISTRY_IMAGE:$MAJORMINOR"
+docker tag $CI_IMAGE_TAG "$CI_REGISTRY_IMAGE:$MAJOR"
+docker tag $CI_IMAGE_TAG "$CI_REGISTRY_IMAGE:$CANONICAL"
+```
+
+> docker e.g. as standin for any artifact
+
+
+> Above snippet can be used as is in gitlab

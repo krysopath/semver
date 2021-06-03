@@ -17,7 +17,7 @@ go get github.com/krysopath/semver@v0.1.2
 
 Parse semantic version from stdin:
 ```
-$ echo "v0.1.23-alpha2+9999" | ./semver | jq
+$ echo "v0.1.23-alpha2+9999" | semver | jq
 {
   "build": "+9999",
   "canonical": "v0.1.23-alpha2",
@@ -29,7 +29,7 @@ $ echo "v0.1.23-alpha2+9999" | ./semver | jq
 
 Parse many versions and sort them:
 ```
-$ echo 'v3 v1.1.1-pre0+999 v3.1.1-dest0 v2 v3.1.1' | go run . -sort | jq
+$ echo 'v3 v1.1.1-pre0+999 v3.1.1-dest0 v2 v3.1.1' | semver -sort | jq
 [
   {
     "canonical": "v1.1.1-pre0",
@@ -77,7 +77,7 @@ $ echo 'v3 v1.1.1-pre0+999 v3.1.1-dest0 v2 v3.1.1' | go run . -sort | jq
 When run inside Gitlab Runners, can execute without stdin:
 ```
 $ export CI_COMMIT_TAG=v1.22.4-some+123
-$ ./semver | jq
+$ semver | jq
 {
   "build": "+123",
   "canonical": "v1.22.4-some",
@@ -85,5 +85,4 @@ $ ./semver | jq
   "majorminor": "v1.22",
   "prerelease": "-some"
 }
-
 ```

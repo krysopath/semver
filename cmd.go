@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 )
 
 type SemanticVersion struct {
@@ -30,8 +31,8 @@ func (s *SemanticVersion) Build() string {
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 	version, _ := reader.ReadString('\n')
-	semver := SemanticVersion{version}
-	fmt.Println(version)
+	trimmed := strings.TrimSpace(version)
+	semver := SemanticVersion{trimmed}
 
 	out := map[string]string{
 		"canonical":  semver.Canonical(),
@@ -40,7 +41,6 @@ func main() {
 		"prerelease": semver.Prerelease(),
 		"build":      semver.Build(),
 	}
-	fmt.Println(out)
 	data, _ := json.Marshal(out)
 	fmt.Println(string(data))
 }

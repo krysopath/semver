@@ -90,7 +90,7 @@ $ semver | jq
 ## In pipelines
 
 ```
-# lets us the great jq to create nobrain parseable 
+# lets use the great jq to create nobrain parseable 
 export SEMVER="$(echo $CI_COMMIT_TAG | semver)"
 
 # lets record the -prerelease+build as SUFFIX

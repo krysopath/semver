@@ -50,7 +50,7 @@ func TestSemanticMethodPrerelease(t *testing.T) {
 	want := "-prerelease.0"
 	success := sem0.Prerelease() == want
 	if !success {
-		t.Fatalf(`SemanticVersion{"v0.1.2-prerelease.0+build.999"}.Canonical() == %q,
+		t.Fatalf(`SemanticVersion{"v0.1.2-prerelease.0+build.999"}.Prerelease() == %q,
 compare for %t, failed: %+v`, want, true, sem0.Prerelease())
 	}
 }
@@ -58,7 +58,7 @@ func TestSemanticMethodBuild(t *testing.T) {
 	want := "+build.999"
 	success := sem0.Build() == want
 	if !success {
-		t.Fatalf(`SemanticVersion{"v0.1.2-prerelease.0+build.999"}.Canonical() == %q,
+		t.Fatalf(`SemanticVersion{"v0.1.2-prerelease.0+build.999"}.Build() == %q,
 compare for %t, failed: %+v`, want, true, sem0.Build())
 	}
 }
@@ -69,7 +69,7 @@ func TestSemanticJson(t *testing.T) {
 
 	success := string(res) == want
 	if !success || err != nil {
-		t.Fatalf(`SemanticVersion{"v0.1.2-prerelease.0+build.999"}.Canonical() == %q,
+		t.Fatalf(`json.Marshal(SemanticVersion{"v0.1.2-prerelease.0+build.999"}) == %q,
 compare for %t, failed: %+v`, want, true, sem0.Build())
 	}
 }

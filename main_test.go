@@ -68,7 +68,7 @@ func TestSemanticJson(t *testing.T) {
 	res, err := json.Marshal(sem0)
 
 	success := string(res) == want
-	if !success && err != nil {
+	if !success || err != nil {
 		t.Fatalf(`SemanticVersion{"v0.1.2-prerelease.0+build.999"}.Canonical() == %q,
 compare for %t, failed: %+v`, want, true, sem0.Build())
 	}

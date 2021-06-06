@@ -20,7 +20,7 @@ type SerialzedSemVer struct {
 	Canonical  string `json:"canonical"`
 	Major      string `json:"major"`
 	MajorMinor string `json:"majorminor"`
-	PreRelease string `json:"prerelease"`
+	Prerelease string `json:"prerelease"`
 	Build      string `json:"build"`
 	Source     string `json:"source"`
 }
@@ -36,9 +36,7 @@ func (s *SemanticVersion) Prerelease() string { return semver.Prerelease(s.value
 func (s *SemanticVersion) Build() string      { return semver.Build(s.value) }
 
 func (s SemanticVersion) String() string {
-	asJson, _ := s.MarshalJSON()
-	data, _ := json.Marshal(asJson)
-	return fmt.Sprintf("%s", data)
+	return fmt.Sprintf("%s", s.value)
 }
 
 func (s SemanticVersion) MarshalJSON() ([]byte, error) {
@@ -47,7 +45,7 @@ func (s SemanticVersion) MarshalJSON() ([]byte, error) {
 			Canonical:  s.Canonical(),
 			Major:      s.Major(),
 			MajorMinor: s.MajorMinor(),
-			PreRelease: s.Prerelease(),
+			Prerelease: s.Prerelease(),
 			Build:      s.Build(),
 			Source:     s.value,
 		})
@@ -68,19 +66,26 @@ func outputSingle(data string) {
 	)
 }
 
-func outputSorted(data string) {
-	vers := strings.Split(data, " ")
+func outputSorted(data []string) {
 	var sorted []SemanticVersion
-	for _, v := range vers {
+	for _, v := range data {
 		sorted = append(sorted, SemanticVersion{v})
 	}
 	sort.Sort(ByVersion(sorted))
-
 	out, _ := json.Marshal(sorted)
 	fmt.Fprintln(os.Stdout, string(out))
 }
 
-func input() string {
+func outputOrdered(data []string) {
+	var sorted []SemanticVersion
+	for _, v := range data {
+		sorted = append(sorted, SemanticVersion{v})
+	}
+	out, _ := json.Marshal(sorted)
+	fmt.Fprintln(os.Stdout, string(out))
+}
+
+func input() []string {
 	fi, err := os.Stdin.Stat()
 	if err != nil {
 		panic(err)
@@ -93,18 +98,21 @@ func input() string {
 		reader := bufio.NewReader(os.Stdin)
 		data, _ = reader.ReadString('\n')
 	}
-	trimmed := strings.TrimSpace(data)
+	trimmed := strings.Fields(data)
+
 	return trimmed
 }
 
 func main() {
 	flag.Parse()
-
 	data := input()
-
-	if *isSorting {
-		outputSorted(data)
+	if len(data) > 1 {
+		if *isSorting {
+			outputSorted(data)
+		} else {
+			outputOrdered(data)
+		}
 	} else {
-		outputSingle(data)
+		outputSingle(data[0])
 	}
 }

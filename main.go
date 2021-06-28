@@ -13,7 +13,8 @@ import (
 )
 
 var (
-	isSorting = flag.Bool("sort", false, "sort strings from $* inputs with semver algo")
+	isSorting  = flag.Bool("sort", false, "sort strings from $* inputs with semver algo")
+	emitFormat = flag.String("format", "json", "output format on stdout")
 )
 
 type SerialzedSemVer struct {
@@ -51,6 +52,16 @@ func (s SemanticVersion) MarshalJSON() ([]byte, error) {
 		})
 }
 
+func (s SemanticVersion) MarshalEVAL() ([]byte, error) {
+	var out string
+
+	out = fmt.Sprintf("%s\nexport %s=%s", out, "MAJOR", s.Major())
+	out = fmt.Sprintf("%s\nexport %s=%s", out, "MAJORMINOR", s.MajorMinor())
+	out = fmt.Sprintf("%s\nexport %s=%s", out, "CANONICAL", s.Canonical())
+
+	return []byte(out), nil
+}
+
 type ByVersion []SemanticVersion
 
 func (a ByVersion) Len() int           { return len(a) }
@@ -59,10 +70,19 @@ func (a ByVersion) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 func outputSingle(data string) {
 	ver := SemanticVersion{data}
-	out, _ := json.Marshal(ver)
+
+	var out []byte
+
+	switch *emitFormat {
+	case "json":
+		out, _ = json.Marshal(ver)
+	case "eval":
+		out, _ = ver.MarshalEVAL()
+	}
+
 	fmt.Fprintln(
 		os.Stdout,
-		string(out),
+		strings.TrimSpace(string(out)),
 	)
 }
 
@@ -106,13 +126,15 @@ func input() []string {
 func main() {
 	flag.Parse()
 	data := input()
-	if len(data) > 1 {
+	if len(data) > 2 {
 		if *isSorting {
 			outputSorted(data)
 		} else {
 			outputOrdered(data)
 		}
-	} else {
+	} else if len(data) == 1 {
 		outputSingle(data[0])
+	} else {
+		flag.Usage()
 	}
 }

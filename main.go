@@ -82,7 +82,7 @@ func outputSingle(data string) {
 
 	fmt.Fprintln(
 		os.Stdout,
-		strings.TrimSpace(string(out)),
+		strings.TrimSpace(shellescape.Quote(string(out))),
 	)
 }
 

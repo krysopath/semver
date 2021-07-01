@@ -15,6 +15,19 @@ go get github.com/krysopath/semver@v0.1.2
 
 ## Usage
 
+Parse tags from git:
+```
+$ git tag | ./semver -sort | jq .[-1]
+{
+  "canonical": "v0.2.0",
+  "major": "v0",
+  "majorminor": "v0.2",
+  "prerelease": "",
+  "build": "",
+  "source": "v0.2.0"
+}
+```
+
 Parse semantic version from stdin:
 ```
 $ echo "v0.1.23-alpha2+9999" | semver | jq

@@ -87,6 +87,14 @@ $ semver | jq
 }
 ```
 
+When you dont like json, but shell:
+```
+$ eval $(echo v3.2.1-yolo22 | ./semver -format=eval)
+$ echo $MAJORMINOR
+v3.2
+```
+
+
 ## In pipelines
 
 ```

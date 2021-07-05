@@ -63,9 +63,19 @@ func (s SemanticVersion) MarshalJSON() ([]byte, error) {
 func (s SemanticVersion) MarshalEVAL() ([]byte, error) {
 	var out string
 
+	//	var properties []func() string = []func() string{
+	//		s.Major, s.MajorMinor, s.Canonical, s.Prerelease, s.Build,
+	//	}
+	//
+	//	for _, fn := range properties {
+	//		out = fmt.Sprintf("%s\nexport MAJOR='%s'", out, shellescape.Quote(s.Major()))
+	//	}
+
 	out = fmt.Sprintf("%s\nexport MAJOR='%s'", out, shellescape.Quote(s.Major()))
 	out = fmt.Sprintf("%s\nexport MAJORMINOR='%s'", out, shellescape.Quote(s.MajorMinor()))
 	out = fmt.Sprintf("%s\nexport CANONICAL='%s'", out, shellescape.Quote(s.Canonical()))
+	out = fmt.Sprintf("%s\nexport PRERELEASE='%s'", out, shellescape.Quote(s.Prerelease()))
+	out = fmt.Sprintf("%s\nexport BUILD='%s'", out, shellescape.Quote(s.Build()))
 
 	return []byte(out), nil
 }

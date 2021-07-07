@@ -19,15 +19,23 @@ var (
 	emitFormat = flag.String("format", "json", "output format on stdout")
 )
 
+type (
+	Canonical  string
+	Major      string
+	MajorMinor string
+	Prerelease string
+	Build      string
+)
+
 // @component SemVer:SemanticVersion:Serialized
 // SerialzedSemVer represents semver as Json
 type SerialzedSemVer struct {
-	Canonical  string `json:"canonical"`
-	Major      string `json:"major"`
-	MajorMinor string `json:"majorminor"`
-	Prerelease string `json:"prerelease"`
-	Build      string `json:"build"`
-	Source     string `json:"source"`
+	Canonical  Canonical  `json:"canonical"`
+	Major      Major      `json:"major"`
+	MajorMinor MajorMinor `json:"majorminor"`
+	Prerelease Prerelease `json:"prerelease"`
+	Build      Build      `json:"build"`
+	Source     string     `json:"source"`
 }
 
 // @component SemVer:SemanticVersion (#semver)
@@ -51,11 +59,11 @@ func (s SemanticVersion) String() string {
 func (s SemanticVersion) MarshalJSON() ([]byte, error) {
 	return json.Marshal(
 		SerialzedSemVer{
-			Canonical:  s.Canonical(),
-			Major:      s.Major(),
-			MajorMinor: s.MajorMinor(),
-			Prerelease: s.Prerelease(),
-			Build:      s.Build(),
+			Canonical:  Canonical(s.Canonical()),
+			Major:      Major(s.Major()),
+			MajorMinor: MajorMinor(s.MajorMinor()),
+			Prerelease: Prerelease(s.Prerelease()),
+			Build:      Build(s.Build()),
 			Source:     s.value,
 		})
 }

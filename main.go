@@ -27,8 +27,6 @@ type (
 	Build      string
 )
 
-// @component SemVer:SemanticVersion:Serialized
-// SerialzedSemVer represents semver as Json
 type SerialzedSemVer struct {
 	Canonical  Canonical  `json:"canonical"`
 	Major      Major      `json:"major"`
@@ -38,8 +36,6 @@ type SerialzedSemVer struct {
 	Source     string     `json:"source"`
 }
 
-// @component SemVer:SemanticVersion (#semver)
-// @mitigates SemVer:Input against wrong format with golang Semver-2.0.0
 type SemanticVersion struct {
 	value string
 }
@@ -50,12 +46,10 @@ func (s *SemanticVersion) MajorMinor() string { return semver.MajorMinor(s.value
 func (s *SemanticVersion) Prerelease() string { return semver.Prerelease(s.value) }
 func (s *SemanticVersion) Build() string      { return semver.Build(s.value) }
 
-// @component SemVer:SemanticVersion:String
 func (s SemanticVersion) String() string {
 	return fmt.Sprintf("%s", s.value)
 }
 
-// @component SemVer:SemanticVersion:Serializer
 func (s SemanticVersion) MarshalJSON() ([]byte, error) {
 	return json.Marshal(
 		SerialzedSemVer{
@@ -88,14 +82,12 @@ func (s SemanticVersion) MarshalEVAL() ([]byte, error) {
 	return []byte(out), nil
 }
 
-// @component SemVer:SemanticVersion:Sort
 type ByVersion []SemanticVersion
 
 func (a ByVersion) Len() int           { return len(a) }
 func (a ByVersion) Less(i, j int) bool { return semver.Compare(a[i].value, a[j].value) < 0 }
 func (a ByVersion) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
-// @component SemVer:Output (#output)
 func outputSingle(data string) {
 	ver := SemanticVersion{data}
 
@@ -114,31 +106,38 @@ func outputSingle(data string) {
 	)
 }
 
-// @component SemVer:Output (#output)
-func outputSorted(data []string) {
-	var sorted []SemanticVersion
-	for _, v := range data {
-		sorted = append(sorted, SemanticVersion{v})
+func toSemVersion(in []string) []SemanticVersion {
+	var out []SemanticVersion
+	for _, v := range in {
+		out = append(out, SemanticVersion{v})
 	}
+	return out
+}
+
+func cleanVersions(versions []SemanticVersion) []SemanticVersion {
+	var cleaned []SemanticVersion
+	for _, v := range versions {
+		if len(v.Canonical()) > 0 {
+			cleaned = append(cleaned, v)
+		} else {
+			fmt.Fprintf(os.Stderr, "WARN: truncated input %s\n", v.value)
+		}
+	}
+	return cleaned
+}
+func outputSorted(data []string) {
+	sorted := cleanVersions(toSemVersion(data))
 	sort.Sort(ByVersion(sorted))
 	out, _ := json.Marshal(sorted)
 	fmt.Fprintln(os.Stdout, string(out))
 }
 
-// @component SemVer:Output (#output)
 func outputOrdered(data []string) {
-	var sorted []SemanticVersion
-	for _, v := range data {
-		sorted = append(sorted, SemanticVersion{v})
-	}
+	sorted := cleanVersions(toSemVersion(data))
 	out, _ := json.Marshal(sorted)
 	fmt.Fprintln(os.Stdout, string(out))
 }
 
-// @accepts user_string to SemVer:Input with  shell variable or stdin
-// @mitigates SemVer:Input against #dos_big_reads with buffered reader
-// @mitigates SemVer:Input against #dos_big_reads with variable size constraint
-// @component SemVer:Input (#input)
 func input() []string {
 	fi, err := os.Stdin.Stat()
 	if err != nil {
@@ -163,7 +162,6 @@ func input() []string {
 	return trimmed
 }
 
-// @component SemVer:Main (#main)
 func main() {
 	flag.Parse()
 	data := input()

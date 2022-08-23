@@ -80,11 +80,6 @@ export CANONICAL="$(echo $SEMVER | jq -r .canonical)"
 docker tag $CI_IMAGE_TAG "$CI_REGISTRY_IMAGE:$MAJORMINOR"
 docker tag $CI_IMAGE_TAG "$CI_REGISTRY_IMAGE:$MAJOR"
 docker tag $CI_IMAGE_TAG "$CI_REGISTRY_IMAGE:$CANONICAL"
-
-# of if very brave:
-eval "$(echo v0 | semver -format eval)"
-echo $MAJOR
-0
 ```
 
 > docker e.g. as standin for any artifact

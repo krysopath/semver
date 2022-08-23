@@ -1,6 +1,8 @@
 TAG = $(shell git tag | sort -r --version-sort | head -n1)
 SEMVERS = $(shell echo $(TAG) | semver)
 
+.PHONY: semver
+
 major:
 	@set -e;\
 	export NEW=$$(echo $(TAG) | semver -release major| jq -r .canonical | tee /dev/stderr); \

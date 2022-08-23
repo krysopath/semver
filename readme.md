@@ -10,14 +10,14 @@ necessity and distrust towards regex.
 ## Installation
 
 ```
-go get github.com/krysopath/semver@v0.2.0
+go get github.com/krysopath/semver@v1
 ```
 
 ## Usage
 
 Parse tags from git:
 ```
-$ git tag | ./semver -sort | jq .[-1]
+$ git tag | head -n1 | semver | jq
 {
   "canonical": "v0.2.0",
   "major": "v0",
@@ -40,52 +40,6 @@ $ echo "v0.1.23-alpha2+9999" | semver | jq
 }
 ```
 
-Parse many versions and sort them:
-```
-$ echo 'v3 v1.1.1-pre0+999 v3.1.1-dest0 v2 v3.1.1' | semver -sort | jq
-[
-  {
-    "canonical": "v1.1.1-pre0",
-    "major": "v1",
-    "majorminor": "v1.1",
-    "prerelease": "-pre0",
-    "build": "+999",
-    "source": "v1.1.1-pre0+999"
-  },
-  {
-    "canonical": "v2.0.0",
-    "major": "v2",
-    "majorminor": "v2.0",
-    "prerelease": "",
-    "build": "",
-    "source": "v2"
-  },
-  {
-    "canonical": "v3.0.0",
-    "major": "v3",
-    "majorminor": "v3.0",
-    "prerelease": "",
-    "build": "",
-    "source": "v3"
-  },
-  {
-    "canonical": "v3.1.1-dest0",
-    "major": "v3",
-    "majorminor": "v3.1",
-    "prerelease": "-dest0",
-    "build": "",
-    "source": "v3.1.1-dest0"
-  },
-  {
-    "canonical": "v3.1.1",
-    "major": "v3",
-    "majorminor": "v3.1",
-    "prerelease": "",
-    "build": "",
-    "source": "v3.1.1"
-  }
-]
-```
 
 When run inside Gitlab Runners, can execute without stdin:
 ```
@@ -126,6 +80,11 @@ export CANONICAL="$(echo $SEMVER | jq -r .canonical)"
 docker tag $CI_IMAGE_TAG "$CI_REGISTRY_IMAGE:$MAJORMINOR"
 docker tag $CI_IMAGE_TAG "$CI_REGISTRY_IMAGE:$MAJOR"
 docker tag $CI_IMAGE_TAG "$CI_REGISTRY_IMAGE:$CANONICAL"
+
+# of if very brave:
+eval "$(echo v0 | semver -format eval)"
+echo $MAJOR
+0
 ```
 
 > docker e.g. as standin for any artifact

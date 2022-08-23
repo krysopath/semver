@@ -6,20 +6,31 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"sort"
 	"strings"
 
-	"github.com/alessio/shellescape"
 	ver "github.com/krysopath/semver/versions"
 )
 
 var (
-	isSorting  = flag.Bool("sort", false, "sort strings from $* inputs with semver algo")
-	emitFormat = flag.String("format", "json", "output format on stdout")
+	emitFormat  = flag.String("format", "json", "output format on stdout")
+	releaseType = flag.String("release", "", "specify a release type to increment the version: major|minor|patch")
 )
 
 func outputSingle(data string) {
 	sem := ver.SemanticVersion{data}
+
+	if len(*releaseType) > 0 {
+		switch *releaseType {
+		case "major":
+			sem = sem.Release("major")
+		case "minor":
+			sem = sem.Release("minor")
+		case "patch":
+			sem = sem.Release("patch")
+		default:
+			panic("omg")
+		}
+	}
 
 	var out []byte
 
@@ -32,29 +43,9 @@ func outputSingle(data string) {
 
 	fmt.Fprintln(
 		os.Stdout,
-		strings.TrimSpace(shellescape.Quote(string(out))),
+		strings.TrimSpace(string(out)),
 	)
 }
-
-func outputSorted(data []string) {
-	var sorted []ver.SemanticVersion
-	for _, v := range data {
-		sorted = append(sorted, ver.SemanticVersion{v})
-	}
-	sort.Sort(ver.ByVersion(sorted))
-	out, _ := json.Marshal(sorted)
-	fmt.Fprintln(os.Stdout, string(out))
-}
-
-func outputOrdered(data []string) {
-	var sorted []ver.SemanticVersion
-	for _, v := range data {
-		sorted = append(sorted, ver.SemanticVersion{v})
-	}
-	out, _ := json.Marshal(sorted)
-	fmt.Fprintln(os.Stdout, string(out))
-}
-
 func input() []string {
 	fi, err := os.Stdin.Stat()
 	if err != nil {
@@ -73,18 +64,11 @@ func input() []string {
 	return trimmed
 }
 
-func main() {
+func init() {
 	flag.Parse()
+}
+
+func main() {
 	data := input()
-	if len(data) > 2 {
-		if *isSorting {
-			outputSorted(data)
-		} else {
-			outputOrdered(data)
-		}
-	} else if len(data) == 1 {
-		outputSingle(data[0])
-	} else {
-		flag.Usage()
-	}
+	outputSingle(data[0])
 }

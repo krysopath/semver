@@ -73,3 +73,30 @@ func TestSemanticJson(t *testing.T) {
 compare for %t, failed: %+v`, want, true, sem0.Build())
 	}
 }
+func TestSemanticMethodReleaseMajor(t *testing.T) {
+	want := "v1.0.0"
+	has := string(sem0.Release("major").Value)
+	success := want == has
+	if !success {
+		t.Fatalf(`SemanticVersion{"v0.1.2-prerelease.0+build.999"} == %q,
+compare for %t, failed: %+v`, want, true, has)
+	}
+}
+func TestSemanticMethodReleaseMinor(t *testing.T) {
+	want := "v0.2.0"
+	has := string(sem0.Release("minor").Value)
+	success := want == has
+	if !success {
+		t.Fatalf(`SemanticVersion{"v0.1.2-prerelease.0+build.999"} == %q,
+compare for %t, failed: %+v`, want, true, has)
+	}
+}
+func TestSemanticMethodReleasePatch(t *testing.T) {
+	want := "v0.1.3"
+	has := string(sem0.Release("patch").Value)
+	success := want == has
+	if !success {
+		t.Fatalf(`SemanticVersion{"v0.1.2-prerelease.0+build.999"} == %q,
+compare for %t, failed: %+v`, want, true, has)
+	}
+}

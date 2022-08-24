@@ -74,7 +74,7 @@
 }
 
 @test run_format_eval_patch {
-  eval $(./semver -release patch-format eval <<<"v0.1.9")
+  eval $(./semver -release patch -format eval <<<"v0.1.9")
   [ "$?" -eq 0  ]
   [ "$MAJOR" = 'v0' ]
   [ "$MAJORMINOR" = 'v0.1' ]

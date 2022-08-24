@@ -24,9 +24,16 @@ release: semver
 	git push
 	git push --tags -f
 
-
-tests:
+gotests:
 	go test ./...
-	
+gobuild:
+	go build ./cmd/...
+tests: gotests gobuild
+	@printf "BATS are testing it now\n"; \
+	for bat in $$(find . -name '*.bats'); do \
+		bats $$bat || { head -n 6 $$bat; echo err:$$bat; exit 1; }; \
+	done;
 install: tests
-	go install ./cmd/...
+	go install -trimpath -ldflags='-extldflags=-static -w -s -X main.version=$(TAG)' ./cmd/...
+	@bash -c "[ $$(git diff $(TAG) -- **/*.bats | wc -c) -eq 0 ]" || echo "!!! breaking changes"
+

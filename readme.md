@@ -13,6 +13,12 @@ necessity and distrust towards regex.
 go install github.com/krysopath/semver/cmd/semver@v1
 ```
 
+or
+
+```
+GO111MODULE=on go get github.com/krysopath/semver/cmd/semver@v1
+```
+
 ## Usage
 
 Parse tags from git:

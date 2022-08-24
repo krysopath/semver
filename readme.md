@@ -10,7 +10,7 @@ necessity and distrust towards regex.
 ## Installation
 
 ```
-go get github.com/krysopath/semver@v1
+go install github.com/krysopath/semver/cmd/semver@v1
 ```
 
 ## Usage

@@ -21,6 +21,17 @@
   [ "$result" = '{"canonical":"v0.0.0","major":"v0","majorminor":"v0.0","prerelease":"","build":"","source":"v0"}' ]
 }
 
+@test run_without_input_and_fail {
+  result=$(./semver; echo $?)
+  [ "$result" -eq 1  ]
+}
+
+@test run_without_with_bad_input {
+  result=$(./semver <<<"abc"; echo $?)
+  [ "$result" -eq 2  ]
+}
+
+
 @test run_via_file_redirection {
   result=$(./semver -release patch -format json < <(echo -e "v0.1.9\n"))
   [ "$?" -eq 0  ]

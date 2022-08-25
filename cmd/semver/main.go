@@ -18,6 +18,10 @@ var (
 
 func outputSingle(data string) {
 	sem := ver.SemanticVersion{data}
+	if !sem.IsValid() {
+		fmt.Fprintf(os.Stderr, "err: no semver: '%s'", sem.Value)
+		os.Exit(2)
+	}
 
 	if len(*releaseType) > 0 {
 		switch *releaseType {
@@ -70,5 +74,9 @@ func init() {
 
 func main() {
 	data := input()
+	if len(data) != 1 {
+		fmt.Fprintln(os.Stderr, "err: no input")
+		os.Exit(1)
+	}
 	outputSingle(data[0])
 }

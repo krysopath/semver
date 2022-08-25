@@ -30,6 +30,7 @@ type SemanticVersion struct {
 	Value string
 }
 
+func (s *SemanticVersion) IsValid() bool          { return bool(semver.IsValid(s.Value)) }
 func (s *SemanticVersion) Canonical() Canonical   { return Canonical(semver.Canonical(s.Value)) }
 func (s *SemanticVersion) Major() Major           { return Major(semver.Major(s.Value)) }
 func (s *SemanticVersion) MajorMinor() MajorMinor { return MajorMinor(semver.MajorMinor(s.Value)) }

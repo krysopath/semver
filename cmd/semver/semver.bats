@@ -26,6 +26,12 @@
   [ "$result" -eq 1  ]
 }
 
+@test run_without_version_prefix {
+  result=$(echo "1.2.3-beta2+build5" | ./semver)
+  [ "$?" -eq 0  ]
+  [ "$result" = '{"canonical":"1.2.3-beta2","major":"1","majorminor":"1.2","prerelease":"-beta2","build":"+build5","source":"1.2.3-beta2+build5"}' ]
+}
+
 @test run_without_with_bad_input {
   result=$(./semver <<<"abc"; echo $?)
   [ "$result" -eq 2  ]

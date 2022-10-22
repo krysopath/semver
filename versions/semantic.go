@@ -30,12 +30,72 @@ type SemanticVersion struct {
 	Value string
 }
 
-func (s *SemanticVersion) IsValid() bool          { return bool(semver.IsValid(s.Value)) }
-func (s *SemanticVersion) Canonical() Canonical   { return Canonical(semver.Canonical(s.Value)) }
-func (s *SemanticVersion) Major() Major           { return Major(semver.Major(s.Value)) }
-func (s *SemanticVersion) MajorMinor() MajorMinor { return MajorMinor(semver.MajorMinor(s.Value)) }
-func (s *SemanticVersion) Prerelease() Prerelease { return Prerelease(semver.Prerelease(s.Value)) }
-func (s *SemanticVersion) Build() Build           { return Build(semver.Build(s.Value)) }
+func (s *SemanticVersion) IsValid() bool {
+	if strings.HasPrefix(s.Value, "v") {
+		return semver.IsValid(s.Value)
+	}
+	return semver.IsValid(fmt.Sprintf("v%s", s.Value))
+}
+
+func (s *SemanticVersion) Canonical() Canonical {
+	if strings.HasPrefix(s.Value, "v") {
+		return Canonical(semver.Canonical(s.Value))
+	}
+	return Canonical(
+		strings.TrimPrefix(
+			semver.Canonical(fmt.Sprintf("v%s", s.Value)),
+			"v",
+		),
+	)
+}
+
+func (s *SemanticVersion) Major() Major {
+	if strings.HasPrefix(s.Value, "v") {
+		return Major(semver.Major(s.Value))
+	}
+	return Major(
+		strings.TrimPrefix(
+			semver.Major(fmt.Sprintf("v%s", s.Value)),
+			"v",
+		),
+	)
+}
+
+func (s *SemanticVersion) MajorMinor() MajorMinor {
+	if strings.HasPrefix(s.Value, "v") {
+		return MajorMinor(semver.MajorMinor(s.Value))
+	}
+	return MajorMinor(
+		strings.TrimPrefix(
+			semver.MajorMinor(fmt.Sprintf("v%s", s.Value)),
+			"v",
+		),
+	)
+}
+
+func (s *SemanticVersion) Prerelease() Prerelease {
+	if strings.HasPrefix(s.Value, "v") {
+		return Prerelease(semver.Prerelease(s.Value))
+	}
+	return Prerelease(
+		strings.TrimPrefix(
+			semver.Prerelease(fmt.Sprintf("v%s", s.Value)),
+			"v",
+		),
+	)
+}
+
+func (s *SemanticVersion) Build() Build {
+	if strings.HasPrefix(s.Value, "v") {
+		return Build(semver.Build(s.Value))
+	}
+	return Build(
+		strings.TrimPrefix(
+			semver.Build(fmt.Sprintf("v%s", s.Value)),
+			"v",
+		),
+	)
+}
 
 func (s SemanticVersion) String() string {
 	return fmt.Sprintf("%s", s.Value)
@@ -55,14 +115,6 @@ func (s SemanticVersion) MarshalJSON() ([]byte, error) {
 
 func (s SemanticVersion) MarshalEVAL() ([]byte, error) {
 	var out string
-
-	//	var properties []func() string = []func() string{
-	//		s.Major, s.MajorMinor, s.Canonical, s.Prerelease, s.Build,
-	//	}
-	//
-	//	for _, fn := range properties {
-	//		out = fmt.Sprintf("%s\nexport MAJOR='%s'", out, shellescape.Quote(s.Major()))
-	//	}
 
 	out = fmt.Sprintf("%s\nexport MAJOR='%s'", out, string(s.Major()))
 	out = fmt.Sprintf("%s\nexport MAJORMINOR='%s'", out, string(s.MajorMinor()))

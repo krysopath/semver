@@ -9,6 +9,8 @@ import (
 	"golang.org/x/mod/semver"
 )
 
+const versionPrefix = "v"
+
 type (
 	Canonical  string
 	Major      string
@@ -30,71 +32,38 @@ type SemanticVersion struct {
 	Value string
 }
 
-func (s *SemanticVersion) IsValid() bool {
-	if strings.HasPrefix(s.Value, "v") {
-		return semver.IsValid(s.Value)
+func restorePrefix(value string, f func(string) string) string {
+	if strings.HasPrefix(value, versionPrefix) {
+		return f(value)
 	}
-	return semver.IsValid(fmt.Sprintf("v%s", s.Value))
+	return strings.TrimPrefix(
+		f(fmt.Sprintf("%s%s", versionPrefix, value)),
+		versionPrefix,
+	)
+}
+
+func (s *SemanticVersion) IsValid() bool {
+	return semver.IsValid(s.Value) || semver.IsValid(fmt.Sprintf("%s%s", versionPrefix, s.Value))
 }
 
 func (s *SemanticVersion) Canonical() Canonical {
-	if strings.HasPrefix(s.Value, "v") {
-		return Canonical(semver.Canonical(s.Value))
-	}
-	return Canonical(
-		strings.TrimPrefix(
-			semver.Canonical(fmt.Sprintf("v%s", s.Value)),
-			"v",
-		),
-	)
+	return Canonical(restorePrefix(s.Value, semver.Canonical))
 }
 
 func (s *SemanticVersion) Major() Major {
-	if strings.HasPrefix(s.Value, "v") {
-		return Major(semver.Major(s.Value))
-	}
-	return Major(
-		strings.TrimPrefix(
-			semver.Major(fmt.Sprintf("v%s", s.Value)),
-			"v",
-		),
-	)
+	return Major(restorePrefix(s.Value, semver.Major))
 }
 
 func (s *SemanticVersion) MajorMinor() MajorMinor {
-	if strings.HasPrefix(s.Value, "v") {
-		return MajorMinor(semver.MajorMinor(s.Value))
-	}
-	return MajorMinor(
-		strings.TrimPrefix(
-			semver.MajorMinor(fmt.Sprintf("v%s", s.Value)),
-			"v",
-		),
-	)
+	return MajorMinor(restorePrefix(s.Value, semver.MajorMinor))
 }
 
 func (s *SemanticVersion) Prerelease() Prerelease {
-	if strings.HasPrefix(s.Value, "v") {
-		return Prerelease(semver.Prerelease(s.Value))
-	}
-	return Prerelease(
-		strings.TrimPrefix(
-			semver.Prerelease(fmt.Sprintf("v%s", s.Value)),
-			"v",
-		),
-	)
+	return Prerelease(restorePrefix(s.Value, semver.Prerelease))
 }
 
 func (s *SemanticVersion) Build() Build {
-	if strings.HasPrefix(s.Value, "v") {
-		return Build(semver.Build(s.Value))
-	}
-	return Build(
-		strings.TrimPrefix(
-			semver.Build(fmt.Sprintf("v%s", s.Value)),
-			"v",
-		),
-	)
+	return Build(restorePrefix(s.Value, semver.Build))
 }
 
 func (s SemanticVersion) String() string {

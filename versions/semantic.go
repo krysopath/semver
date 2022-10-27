@@ -101,7 +101,7 @@ func (s *SemanticVersion) Release(rType string) SemanticVersion {
 		if err != nil {
 			panic(err)
 		}
-		major += 1
+		major++
 		return SemanticVersion{fmt.Sprintf("v%d.0.0", major)}
 	case "minor":
 		major, err := strconv.Atoi(strings.TrimPrefix(string(s.Major()), "v"))
@@ -112,7 +112,7 @@ func (s *SemanticVersion) Release(rType string) SemanticVersion {
 		if err != nil {
 			panic(err)
 		}
-		minor += 1
+		minor++
 		return SemanticVersion{fmt.Sprintf("v%d.%d.0", major, minor)}
 	case "patch":
 		major, err := strconv.Atoi(strings.TrimPrefix(string(s.Major()), "v"))
@@ -129,7 +129,7 @@ func (s *SemanticVersion) Release(rType string) SemanticVersion {
 		if err != nil {
 			panic(err)
 		}
-		newPatch += 1
+		newPatch++
 		return SemanticVersion{fmt.Sprintf("v%d.%d.%d", major, minor, newPatch)}
 	default:
 		panic(fmt.Sprintf("err: %s unkown release type", rType))

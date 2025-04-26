@@ -40,18 +40,23 @@ Subject to the terms and conditions of this License, you are hereby granted the 
 4. Acceptance
 
 In order to receive the rights granted by this license, you must agree to its terms. If you do not agree to these terms, you may not use, modify, or distribute the Work.
+
 5. Termination
 
 Your rights under this License will terminate automatically if you fail to comply with any of its terms. Upon termination, you must cease all use, modification, and distribution of the Work.
+
 6. Disclaimer of Warranty
 
 The Work is provided "as-is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. In no event shall the authors be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the Work or the use or other dealings in the Work.
+
 7. Limitation of Liability
 
 In no event and under no legal theory, whether in tort (including negligence), contract, or otherwise, unless required by applicable law (such as deliberate and grossly negligent acts) or agreed to in writing, shall any Contributor be liable to you for damages, including any direct, indirect, special, incidental, or consequential damages of any character arising as a result of this License or out of the use or inability to use the Work (including but not limited to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses), even if such Contributor has been advised of the possibility of such damages.
+
 8. Severability
 
 If any provision of this License is held to be unenforceable, such provision shall be reformed only to the extent necessary to make it enforceable. If any provision of this License is found to be invalid or unenforceable, the validity, legality, and enforceability of the remaining provisions shall not be affected or impaired.
+
 9. Governing Law
 
 This License shall be governed by and interpreted in accordance with the laws of the jurisdiction where the principal place of business of the Licensor is located, excluding its conflicts of law principles.

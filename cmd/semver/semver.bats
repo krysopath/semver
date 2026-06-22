@@ -12,13 +12,13 @@
 @test run_via_pipe {
   result=$(echo v0 | ./semver)
   [ "$?" -eq 0  ]
-  [ "$result" = '{"canonical":"v0.0.0","major":"v0","majorminor":"v0.0","prerelease":"","build":"","source":"v0"}' ]
+  [ "$result" = '{"canonical":"v0.0.0","major":"v0","majorminor":"v0.0","numcanonical":"0.0.0","nummajor":"0","nummajorminor":"0.0","prerelease":"","build":"","source":"v0"}' ]
 }
 
 @test run_via_bash_redirection {
   result=$(./semver <<<"v0")
   [ "$?" -eq 0  ]
-  [ "$result" = '{"canonical":"v0.0.0","major":"v0","majorminor":"v0.0","prerelease":"","build":"","source":"v0"}' ]
+  [ "$result" = '{"canonical":"v0.0.0","major":"v0","majorminor":"v0.0","numcanonical":"0.0.0","nummajor":"0","nummajorminor":"0.0","prerelease":"","build":"","source":"v0"}' ]
 }
 
 @test run_without_input_and_fail {
@@ -29,7 +29,7 @@
 @test run_without_version_prefix {
   result=$(echo "1.2.3-beta2+build5" | ./semver)
   [ "$?" -eq 0  ]
-  [ "$result" = '{"canonical":"1.2.3-beta2","major":"1","majorminor":"1.2","prerelease":"-beta2","build":"+build5","source":"1.2.3-beta2+build5"}' ]
+  [ "$result" = '{"canonical":"1.2.3-beta2","major":"1","majorminor":"1.2","numcanonical":"1.2.3-beta2","nummajor":"1","nummajorminor":"1.2","prerelease":"-beta2","build":"+build5","source":"1.2.3-beta2+build5"}' ]
 }
 
 @test run_without_with_bad_input {
@@ -41,37 +41,37 @@
 @test run_via_file_redirection {
   result=$(./semver -release patch -format json < <(echo -e "v0.1.9\n"))
   [ "$?" -eq 0  ]
-  [ "$result" = '{"canonical":"v0.1.10","major":"v0","majorminor":"v0.1","prerelease":"","build":"","source":"v0.1.10"}' ]
+  [ "$result" = '{"canonical":"v0.1.10","major":"v0","majorminor":"v0.1","numcanonical":"0.1.10","nummajor":"0","nummajorminor":"0.1","prerelease":"","build":"","source":"v0.1.10"}' ]
 }
 
 @test run_minor {
   result=$(./semver <<<"v0.1")
   [ "$?" -eq 0  ]
-  [ "$result" = '{"canonical":"v0.1.0","major":"v0","majorminor":"v0.1","prerelease":"","build":"","source":"v0.1"}' ]
+  [ "$result" = '{"canonical":"v0.1.0","major":"v0","majorminor":"v0.1","numcanonical":"0.1.0","nummajor":"0","nummajorminor":"0.1","prerelease":"","build":"","source":"v0.1"}' ]
 }
 
 @test run_patch {
   result=$(./semver <<<"v0.1.9")
   [ "$?" -eq 0  ]
-  [ "$result" = '{"canonical":"v0.1.9","major":"v0","majorminor":"v0.1","prerelease":"","build":"","source":"v0.1.9"}' ]
+  [ "$result" = '{"canonical":"v0.1.9","major":"v0","majorminor":"v0.1","numcanonical":"0.1.9","nummajor":"0","nummajorminor":"0.1","prerelease":"","build":"","source":"v0.1.9"}' ]
 }
 
 @test run_release_new_major {
   result=$(./semver -release major <<<"v0.1.9")
   [ "$?" -eq 0  ]
-  [ "$result" = '{"canonical":"v1.0.0","major":"v1","majorminor":"v1.0","prerelease":"","build":"","source":"v1.0.0"}' ]
+  [ "$result" = '{"canonical":"v1.0.0","major":"v1","majorminor":"v1.0","numcanonical":"1.0.0","nummajor":"1","nummajorminor":"1.0","prerelease":"","build":"","source":"v1.0.0"}' ]
 }
 
 @test run_release_new_minor {
   result=$(./semver -release minor <<<"v0.1.9")
   [ "$?" -eq 0  ]
-  [ "$result" = '{"canonical":"v0.2.0","major":"v0","majorminor":"v0.2","prerelease":"","build":"","source":"v0.2.0"}' ]
+  [ "$result" = '{"canonical":"v0.2.0","major":"v0","majorminor":"v0.2","numcanonical":"0.2.0","nummajor":"0","nummajorminor":"0.2","prerelease":"","build":"","source":"v0.2.0"}' ]
 }
 
 @test run_release_new_patch {
   result=$(./semver -release patch <<<"v0.1.9")
   [ "$?" -eq 0  ]
-  [ "$result" = '{"canonical":"v0.1.10","major":"v0","majorminor":"v0.1","prerelease":"","build":"","source":"v0.1.10"}' ]
+  [ "$result" = '{"canonical":"v0.1.10","major":"v0","majorminor":"v0.1","numcanonical":"0.1.10","nummajor":"0","nummajorminor":"0.1","prerelease":"","build":"","source":"v0.1.10"}' ]
 }
 
 @test run_format_eval_major {
@@ -80,6 +80,9 @@
   [ "$MAJOR" = 'v1' ]
   [ "$MAJORMINOR" = 'v1.0' ]
   [ "$CANONICAL" = 'v1.0.0' ]
+  [ "$NUM_MAJOR" = '1' ]
+  [ "$NUM_MAJORMINOR" = '1.0' ]
+  [ "$NUM_CANONICAL" = '1.0.0' ]
 }
 
 @test run_format_eval_minor {
@@ -88,6 +91,9 @@
   [ "$MAJOR" = 'v0' ]
   [ "$MAJORMINOR" = 'v0.2' ]
   [ "$CANONICAL" = 'v0.2.0' ]
+  [ "$NUM_MAJOR" = '0' ]
+  [ "$NUM_MAJORMINOR" = '0.2' ]
+  [ "$NUM_CANONICAL" = '0.2.0' ]
 }
 
 @test run_format_eval_patch {
@@ -96,5 +102,7 @@
   [ "$MAJOR" = 'v0' ]
   [ "$MAJORMINOR" = 'v0.1' ]
   [ "$CANONICAL" = 'v0.1.10' ]
+  [ "$NUM_MAJOR" = '0' ]
+  [ "$NUM_MAJORMINOR" = '0.1' ]
+  [ "$NUM_CANONICAL" = '0.1.10' ]
 }
-

@@ -20,12 +20,15 @@ type (
 )
 
 type SerialzedSemVer struct {
-	Canonical  Canonical  `json:"canonical"`
-	Major      Major      `json:"major"`
-	MajorMinor MajorMinor `json:"majorminor"`
-	Prerelease Prerelease `json:"prerelease"`
-	Build      Build      `json:"build"`
-	Source     string     `json:"source"`
+	Canonical     Canonical  `json:"canonical"`
+	Major         Major      `json:"major"`
+	MajorMinor    MajorMinor `json:"majorminor"`
+	NumCanonical  string     `json:"numcanonical"`
+	NumMajor      string     `json:"nummajor"`
+	NumMajorMinor string     `json:"nummajorminor"`
+	Prerelease    Prerelease `json:"prerelease"`
+	Build         Build      `json:"build"`
+	Source        string     `json:"source"`
 }
 
 type SemanticVersion struct {
@@ -58,6 +61,18 @@ func (s *SemanticVersion) MajorMinor() MajorMinor {
 	return MajorMinor(restorePrefix(s.Value, semver.MajorMinor))
 }
 
+func (s *SemanticVersion) NumCanonical() string {
+	return strings.TrimPrefix(string(s.Canonical()), versionPrefix)
+}
+
+func (s *SemanticVersion) NumMajor() string {
+	return strings.TrimPrefix(string(s.Major()), versionPrefix)
+}
+
+func (s *SemanticVersion) NumMajorMinor() string {
+	return strings.TrimPrefix(string(s.MajorMinor()), versionPrefix)
+}
+
 func (s *SemanticVersion) Prerelease() Prerelease {
 	return Prerelease(restorePrefix(s.Value, semver.Prerelease))
 }
@@ -73,12 +88,15 @@ func (s SemanticVersion) String() string {
 func (s SemanticVersion) MarshalJSON() ([]byte, error) {
 	return json.Marshal(
 		SerialzedSemVer{
-			Canonical:  s.Canonical(),
-			Major:      s.Major(),
-			MajorMinor: s.MajorMinor(),
-			Prerelease: s.Prerelease(),
-			Build:      s.Build(),
-			Source:     s.Value,
+			Canonical:     s.Canonical(),
+			Major:         s.Major(),
+			MajorMinor:    s.MajorMinor(),
+			NumCanonical:  s.NumCanonical(),
+			NumMajor:      s.NumMajor(),
+			NumMajorMinor: s.NumMajorMinor(),
+			Prerelease:    s.Prerelease(),
+			Build:         s.Build(),
+			Source:        s.Value,
 		})
 }
 
@@ -88,6 +106,9 @@ func (s SemanticVersion) MarshalEVAL() ([]byte, error) {
 	out = fmt.Sprintf("%s\nexport MAJOR='%s'", out, string(s.Major()))
 	out = fmt.Sprintf("%s\nexport MAJORMINOR='%s'", out, string(s.MajorMinor()))
 	out = fmt.Sprintf("%s\nexport CANONICAL='%s'", out, string(s.Canonical()))
+	out = fmt.Sprintf("%s\nexport NUM_MAJOR='%s'", out, s.NumMajor())
+	out = fmt.Sprintf("%s\nexport NUM_MAJORMINOR='%s'", out, s.NumMajorMinor())
+	out = fmt.Sprintf("%s\nexport NUM_CANONICAL='%s'", out, s.NumCanonical())
 	out = fmt.Sprintf("%s\nexport PRERELEASE='%s'", out, string(s.Prerelease()))
 	out = fmt.Sprintf("%s\nexport BUILD='%s'", out, string(s.Build()))
 

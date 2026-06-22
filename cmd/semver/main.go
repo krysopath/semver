@@ -14,6 +14,7 @@ import (
 var (
 	emitFormat  = flag.String("format", "json", "output format on stdout")
 	releaseType = flag.String("release", "", "specify a release type to increment the version: major|minor|patch")
+	stripV      = flag.Bool("strip-v", false, "omit the 'v' prefix from output values")
 )
 
 func outputSingle(data string) {
@@ -78,5 +79,10 @@ func main() {
 		fmt.Fprintln(os.Stderr, "err: no input")
 		os.Exit(1)
 	}
+
+	if *stripV {
+		ver.StripV = true
+	}
+
 	outputSingle(data[0])
 }

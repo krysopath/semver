@@ -2,6 +2,7 @@ package versions
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 )
 
@@ -46,17 +47,6 @@ func TestSemanticMethodCanonical(t *testing.T) {
 compare for %t, failed: %+v`, want, true, sem0.Canonical())
 	}
 }
-func TestSemanticMethodNumFields(t *testing.T) {
-	if sem0.NumMajor() != "0" {
-		t.Fatalf("Expected NumMajor to be '0', got %q", sem0.NumMajor())
-	}
-	if sem0.NumMajorMinor() != "0.1" {
-		t.Fatalf("Expected NumMajorMinor to be '0.1', got %q", sem0.NumMajorMinor())
-	}
-	if sem0.NumCanonical() != "0.1.2-prerelease.0" {
-		t.Fatalf("Expected NumCanonical to be '0.1.2-prerelease.0', got %q", sem0.NumCanonical())
-	}
-}
 func TestSemanticMethodPrerelease(t *testing.T) {
 	want := "-prerelease.0"
 	success := string(sem0.Prerelease()) == want
@@ -75,13 +65,13 @@ compare for %t, failed: %+v`, want, true, sem0.Build())
 }
 
 func TestSemanticJson(t *testing.T) {
-	want := `{"canonical":"v0.1.2-prerelease.0","major":"v0","majorminor":"v0.1","numcanonical":"0.1.2-prerelease.0","nummajor":"0","nummajorminor":"0.1","prerelease":"-prerelease.0","build":"+build.999","source":"v0.1.2-prerelease.0+build.999"}`
+	want := `{"canonical":"v0.1.2-prerelease.0","major":"v0","majorminor":"v0.1","prerelease":"-prerelease.0","build":"+build.999","source":"v0.1.2-prerelease.0+build.999"}`
 	res, err := json.Marshal(sem0)
 
 	success := string(res) == want
 	if !success || err != nil {
 		t.Fatalf(`json.Marshal(SemanticVersion{"v0.1.2-prerelease.0+build.999"}) == %q,
-compare for %t, failed: %+v`, want, true, string(res))
+compare for %t, failed: %+v`, want, true, sem0.Build())
 	}
 }
 func TestSemanticMethodReleaseMajor(t *testing.T) {
@@ -109,5 +99,34 @@ func TestSemanticMethodReleasePatch(t *testing.T) {
 	if !success {
 		t.Fatalf(`SemanticVersion{"v0.1.2-prerelease.0+build.999"} == %q,
 compare for %t, failed: %+v`, want, true, has)
+	}
+}
+
+func TestSemanticJsonWithStripV(t *testing.T) {
+	StripV = true
+	defer func() { StripV = false }()
+
+	want := `{"canonical":"0.1.2-prerelease.0","major":"0","majorminor":"0.1","prerelease":"-prerelease.0","build":"+build.999","source":"v0.1.2-prerelease.0+build.999"}`
+	res, err := json.Marshal(sem0)
+
+	if err != nil || string(res) != want {
+		t.Fatalf("StripV JSON marshaling failed.\nWant: %s\nGot:  %s", want, string(res))
+	}
+}
+
+func TestSemanticEvalWithStripV(t *testing.T) {
+	StripV = true
+	defer func() { StripV = false }()
+
+	res, err := sem0.MarshalEVAL()
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	out := string(res)
+	if !strings.Contains(out, "export MAJOR='0'") ||
+		!strings.Contains(out, "export MAJORMINOR='0.1'") ||
+		!strings.Contains(out, "export CANONICAL='0.1.2-prerelease.0'") {
+		t.Fatalf("StripV EVAL marshaling failed to strip prefix.\nGot output:\n%s", out)
 	}
 }

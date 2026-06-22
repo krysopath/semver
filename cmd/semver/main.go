@@ -18,7 +18,7 @@ var (
 )
 
 func outputSingle(data string) {
-	sem := ver.SemanticVersion{data}
+	sem := ver.SemanticVersion{Value: data}
 	if !sem.IsValid() {
 		fmt.Fprintf(os.Stderr, "err: no semver: '%s'", sem.Value)
 		os.Exit(2)

@@ -11,6 +11,8 @@ import (
 
 const versionPrefix = "v"
 
+var StripV bool
+
 type (
 	Canonical  string
 	Major      string
@@ -40,6 +42,13 @@ func restorePrefix(value string, f func(string) string) string {
 		f(fmt.Sprintf("%s%s", versionPrefix, value)),
 		versionPrefix,
 	)
+}
+
+func trimV(s string) string {
+	if StripV {
+		return strings.TrimPrefix(s, versionPrefix)
+	}
+	return s
 }
 
 func (s *SemanticVersion) IsValid() bool {
@@ -73,9 +82,9 @@ func (s SemanticVersion) String() string {
 func (s SemanticVersion) MarshalJSON() ([]byte, error) {
 	return json.Marshal(
 		SerialzedSemVer{
-			Canonical:  s.Canonical(),
-			Major:      s.Major(),
-			MajorMinor: s.MajorMinor(),
+			Canonical:  Canonical(trimV(string(s.Canonical()))),
+			Major:      Major(trimV(string(s.Major()))),
+			MajorMinor: MajorMinor(trimV(string(s.MajorMinor()))),
 			Prerelease: s.Prerelease(),
 			Build:      s.Build(),
 			Source:     s.Value,
@@ -85,9 +94,9 @@ func (s SemanticVersion) MarshalJSON() ([]byte, error) {
 func (s SemanticVersion) MarshalEVAL() ([]byte, error) {
 	var out string
 
-	out = fmt.Sprintf("%s\nexport MAJOR='%s'", out, string(s.Major()))
-	out = fmt.Sprintf("%s\nexport MAJORMINOR='%s'", out, string(s.MajorMinor()))
-	out = fmt.Sprintf("%s\nexport CANONICAL='%s'", out, string(s.Canonical()))
+	out = fmt.Sprintf("%s\nexport MAJOR='%s'", out, trimV(string(s.Major())))
+	out = fmt.Sprintf("%s\nexport MAJORMINOR='%s'", out, trimV(string(s.MajorMinor())))
+	out = fmt.Sprintf("%s\nexport CANONICAL='%s'", out, trimV(string(s.Canonical())))
 	out = fmt.Sprintf("%s\nexport PRERELEASE='%s'", out, string(s.Prerelease()))
 	out = fmt.Sprintf("%s\nexport BUILD='%s'", out, string(s.Build()))
 

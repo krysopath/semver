@@ -2,6 +2,7 @@ package versions
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 )
 
@@ -98,5 +99,34 @@ func TestSemanticMethodReleasePatch(t *testing.T) {
 	if !success {
 		t.Fatalf(`SemanticVersion{"v0.1.2-prerelease.0+build.999"} == %q,
 compare for %t, failed: %+v`, want, true, has)
+	}
+}
+
+func TestSemanticJsonWithStripV(t *testing.T) {
+	StripV = true
+	defer func() { StripV = false }()
+
+	want := `{"canonical":"0.1.2-prerelease.0","major":"0","majorminor":"0.1","prerelease":"-prerelease.0","build":"+build.999","source":"v0.1.2-prerelease.0+build.999"}`
+	res, err := json.Marshal(sem0)
+
+	if err != nil || string(res) != want {
+		t.Fatalf("StripV JSON marshaling failed.\nWant: %s\nGot:  %s", want, string(res))
+	}
+}
+
+func TestSemanticEvalWithStripV(t *testing.T) {
+	StripV = true
+	defer func() { StripV = false }()
+
+	res, err := sem0.MarshalEVAL()
+	if err != nil {
+		t.Fatalf("Unexpected error: %v", err)
+	}
+
+	out := string(res)
+	if !strings.Contains(out, "export MAJOR='0'") ||
+		!strings.Contains(out, "export MAJORMINOR='0.1'") ||
+		!strings.Contains(out, "export CANONICAL='0.1.2-prerelease.0'") {
+		t.Fatalf("StripV EVAL marshaling failed to strip prefix.\nGot output:\n%s", out)
 	}
 }

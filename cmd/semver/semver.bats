@@ -98,3 +98,23 @@
   [ "$CANONICAL" = 'v0.1.10' ]
 }
 
+@test run_with_strip_v_flag_json {
+  result=$(./semver -strip-v <<<"v1.2.3")
+  [ "$?" -eq 0 ]
+  [ "$result" = '{"canonical":"1.2.3","major":"1","majorminor":"1.2","prerelease":"","build":"","source":"v1.2.3"}' ]
+}
+
+@test run_with_strip_v_flag_json_no_prefix_input {
+  result=$(./semver -strip-v <<<"1.2.3")
+  [ "$?" -eq 0 ]
+  # Should still output correctly even if input didn't have a 'v'
+  [ "$result" = '{"canonical":"1.2.3","major":"1","majorminor":"1.2","prerelease":"","build":"","source":"1.2.3"}' ]
+}
+
+@test run_format_eval_with_strip_v {
+  eval $(./semver -release minor -format eval -strip-v <<<"v0.1.9")
+  [ "$?" -eq 0 ]
+  [ "$MAJOR" = '0' ]
+  [ "$MAJORMINOR" = '0.2' ]
+  [ "$CANONICAL" = '0.2.0' ]
+}
